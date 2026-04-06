@@ -1,123 +1,179 @@
-import java.util.HashSet;
-import java.util.Set;
-import javafx.animation.AnimationTimer;
-import javafx.application.Application;
-import javafx.scene.Scene;
-import javafx.scene.input.KeyCode;
-import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
-import javafx.stage.Stage;
+import java.util.Scanner;
 
-public class Main extends Application {
-    private static final int WIDTH = 1000;
-    private static final int HEIGHT = 700;
-
-    private Rectangle player;
-    private Rectangle ground;
-
-    private double playerX = 100;
-    private double playerY = 500;
-    private double velocityX = 0;
-    private double velocityY = 0;
-
-    private static final double MOVE_SPEED = 4;
-    private static final double JUMP_POWER = -12;
-    private static final double GRAVITY = 0.5;
-
-    private boolean onGround = false;
-    private final Set<KeyCode> pressedKeys = new HashSet<>();
-
-    @Override
-    public void start(Stage stage) {
-        Pane root = new Pane();
-        root.setPrefSize(WIDTH, HEIGHT);
-        root.setStyle("-fx-background-color: linear-gradient(to bottom, #1b1b1b, #3a3a3a);");
-
-        player = new Rectangle(40, 60, Color.WHITE);
-        player.setArcWidth(10);
-        player.setArcHeight(10);
-        player.setX(playerX);
-        player.setY(playerY);
-
-        ground = new Rectangle(0, 620, WIDTH, 80);
-        ground.setFill(Color.DARKSLATEGRAY);
-
-        root.getChildren().addAll(ground, player);
-
-        Scene scene = new Scene(root, WIDTH, HEIGHT);
-        scene.setOnKeyPressed(event -> pressedKeys.add(event.getCode()));
-        scene.setOnKeyReleased(event -> pressedKeys.remove(event.getCode()));
-
-        AnimationTimer gameLoop = new AnimationTimer() {
-            @Override
-            public void handle(long now) {
-                update();
-            }
-        };
-        gameLoop.start();
-
-        stage.setTitle("Metroidvania Prototype");
-        stage.setScene(scene);
-        stage.show();
-    }
-
-    private void update() {
-        handleInput();
-        applyPhysics();
-        checkCollisions();
-        updatePlayerPosition();
-    }
-
-    private void handleInput() {
-        velocityX = 0;
-        if (pressedKeys.contains(KeyCode.A)) {
-            velocityX = -MOVE_SPEED;
-        }
-        if (pressedKeys.contains(KeyCode.D)) {
-            velocityX = MOVE_SPEED;
-        }
-        if ((pressedKeys.contains(KeyCode.W) || pressedKeys.contains(KeyCode.SPACE)) && onGround) {
-            velocityY = JUMP_POWER;
-            onGround = false;
-        }
-    }
-
-    private void applyPhysics() {
-        velocityY += GRAVITY;
-    }
-
-    private void checkCollisions() {
-        double nextY = playerY + velocityY;
-        double bottom = nextY + player.getHeight();
-        double groundY = ground.getY();
-
-        if (bottom >= groundY && playerX + player.getWidth() > ground.getX() && playerX < ground.getX() + ground.getWidth()) {
-            nextY = groundY - player.getHeight();
-            velocityY = 0;
-            onGround = true;
-        } else {
-            onGround = false;
-        }
-
-        playerY = nextY;
-
-        double nextX = playerX + velocityX;
-        if (nextX < 0) {
-            nextX = 0;
-        }
-        if (nextX + player.getWidth() > WIDTH) {
-            nextX = WIDTH - player.getWidth();
-        }
-        playerX = nextX;
-    }
-
-    private void updatePlayerPosition() {
-        player.setX(playerX);
-        player.setY(playerY);
-    }
+public class Main {
+    static Scanner sc = new Scanner(System.in);
 
     public static void main(String[] args) {
-        launch(args);
+        startGame();
+    }
+
+    public static void startGame() {
+        System.out.println("------ Welcome to the Game! -----");
+        System.out.println("Nigt echo - prolog");
+        System.out.println("----------------------------------");
+        System.out.println();
+        System.out.println("ты просыпаешься в темной комнате, не помнишь, как сюда попал. Вокруг тебя только тишина и темнота.");
+        System.out.println("старый деревянный дом скрипит, а за дверью слышится странный шум. ");
+        System.out.println();
+
+        firstScene();
+    }
+
+    public static void firstScene() {
+        System.out.println("Лира: ...где я?");
+        System.out.println("Лира: почему здесь так холодно?");
+        System.out.println();
+        System.out.println("Что сделать?");
+        System.out.println("1. Осмотреть комнату");
+        System.out.println("2. Подойти к двери");
+        System.out.println("3. Закрыть глаза и притвориться, что ничего не происходит");
+
+        int choice = sc.nextInt();
+        sc.nextLine(); 
+
+        if (choice == 1) {
+            inspectRoom();
+        } else if (choice == 2) {
+            goToDoor();
+        } else if (choice == 3) {
+            stayStill();
+        } else {
+            System.out.println("Неверный выбор. Попробуйте снова.");
+            firstScene();
+        }
+
+    }
+
+    public static void inspectRoom() {
+        System.out.println("Ты осматриваешь комнату и видишь старый стол, покрытый пылью, и разбитое зеркало на стене.");
+        System.out.println("Под окном ты видишь шкаф.");
+        System.out.println("На полу ты замечаешь маленький ключ.");
+        System.out.println();
+        System.out.println("Лира: Ключ?... Может, он отсюда?");
+        System.out.println();
+        System.out.println("1. Взять ключ");
+        System.out.println("2. Заглянуть в шкаф");
+
+        int choice = sc.nextInt();
+        sc.nextLine();
+
+        if (choice == 1) {
+            System.out.println();
+            System.out.println("Ты берешь ключ и идешь к двери. ");
+            lockedDoorWithKey();
+        } else if (choice == 2) {
+            closetScene();
+        } else {
+            System.out.println("Неверный выбор. Попробуйте снова.");
+            inspectRoom();
+        }
+        
+    }
+
+    public static void goToDoor() {
+        System.out.println("Ты подходишь к двери и слышишь странный шум за ней.");
+        System.out.println("Дверь заперта, и ты не можешь открыть ее.");
+        System.out.println();
+        System.out.println("Лира: Заперто...Черт.");
+        System.out.println();
+        System.out.println("1. Осмотреть комнату");
+        System.out.println("2. Постучать в дверь");
+
+        int choice = sc.nextInt();
+        sc.nextLine();
+
+        if (choice == 1) {
+            inspectRoom();
+        } else if (choice == 2) {
+            System.out.println();
+            System.out.println("Ты стучишь в дверь, и шум за ней становится громче.");
+            System.out.println("Вдруг дверь открывается, и ты видишь темную фигуру, стоящую в проеме.");
+            System.out.println("Фигура говорит: 'Ты не должен был сюда приходить...'");
+            System.out.println();
+            System.out.println("Лира: Кто ты? Что ты хочешь от меня?");
+            System.out.println();
+            System.out.println("1. Спрятаться");
+            System.out.println("2. Поговорить с фигурой");
+
+            int choice2 = sc.nextInt();
+            sc.nextLine();
+
+            if (choice2 == 1) {
+                inspectRoom();
+            } else if (choice2 == 2) {
+                System.out.println();
+                System.out.println("Ты стучишь в дверь.");
+                System.out.println("За дверью становится тише.");
+                System.out.println("А потом ты слышишь тихий голос, который говорит");
+                System.out.println("'Не открывай...'");
+                System.out.println("Лира: Кто здечь?");
+                System.out.println();
+                firstScene();
+            } else {
+                System.out.println("Неверный выбор. Попробуйте снова.");
+                goToDoor();
+            }
+        }
+    }
+
+    public static void stayStill() {
+        System.out.println("Ты замираешь и стараешься не дышать");
+        System.out.println("Шаги за дверью становятся ближе");
+        System.out.println("Ты слышишь, как дкто то медленно проводит ногтем по двери");
+        System.out.println();
+        System.out.println("Лира: Черт... Они уже здесь...");
+        System.out.println();
+        System.out.println("1. Осмотреть комнату");
+        System.out.println("2. Подойти к двери");
+
+        int choice = sc.nextInt();
+        sc.nextLine();
+
+        if (choice == 1) {
+            inspectRoom();
+        } else if (choice == 2) {
+            goToDoor();
+        } else {
+            System.out.println("Неверный выбор. Попробуйте снова.");
+            stayStill();
+        }
+    }
+
+    public static void closetScene() {
+        System.out.println("Ты открываешь шкаф и видишь старую одежду и коробку с надписью ....");
+        System.out.println("Ты открываешь коробку и находишь внутри записку.");
+        System.out.println("На записке написано: 'Если ты слышишь шепот - не отвечай.'");
+        System.out.println();
+        System.out.println("Лира: Шепот? Что это может значить?");
+        System.out.println();
+        System.out.println("1. Взять записку и идти к двери");
+        System.out.println("2. Вернуться назад ");
+
+        int choice = sc.nextInt();
+        sc.nextLine();
+
+        if (choice == 1) {
+            System.out.println();
+            System.out.println("Ты берешь записку и идешь к двери.");
+            goToDoor();
+        } else if (choice == 2) {
+            firstScene();
+        } else {
+            System.out.println("Неверный выбор. Попробуйте снова.");
+            closetScene();
+        }
+     
+    }
+
+    public static void lockedDoorWithKey() {
+        System.out.println("Ты используешь ключ, чтобы открыть дверь.");
+        System.out.println("Слышится тихий щелчок, и дверь медленно открывается.");
+        System.out.println();
+        System.out.println("Лира: Получилось... Но что там?");
+        System.out.println("Дверь открывается, и ты видишь длинный коридор, освещенный тусклым светом.");
+        System.out.println("Доносится детская мелодия и резкий детский смех.");
+        System.out.println();
+        System.out.println("Конец демо-версии. Спасибо за игру!");
+        
     }
 }
