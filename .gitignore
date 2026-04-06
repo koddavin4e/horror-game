@@ -1,0 +1,12 @@
+# Ignore compiled Java classes
+*.class
+
+# Ignore IDE files
+*.iml
+*.idea/
+*.classpath
+*.project
+
+# Ignore build output
+out/
+target/
